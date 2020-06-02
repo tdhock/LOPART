@@ -1,0 +1,14 @@
+Package: LOPART
+Type: Package
+Title: Labeled Optimal Partitioning
+Version: 2020.6.1
+Author: Toby Dylan Hocking
+Maintainer: Toby Dylan Hocking <toby.hocking@r-project.org>
+Description: Changepoint detection algorithm with
+ penalty and label constraints.
+License: GPL-3
+LinkingTo: Rcpp
+URL: https://github.com/tdhock/LOPART
+BugReports: https://github.com/tdhock/LOPART/issues
+Imports: data.table, Rcpp
+Suggests: ggplot2, testthat
