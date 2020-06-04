@@ -182,3 +182,9 @@ test_that("error for start < 0", {
     LOPART:::LOPART_interface(x, -1, 2, 1, 1)
   }, "label start must be zero or larger")
 })
+
+test_that("error for no data", {
+  expect_error({
+    LOPART:::LOPART_interface(numeric(), integer(), integer(), integer(), 1)
+  }, "no data")
+})

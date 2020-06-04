@@ -1,0 +1,10 @@
+TODOs
+
+2020.6.4
+
+support for penalty=Inf, only penalize changes outside of labels.
+
+2020.6.1
+
+First version coded for NeurIPS submission.
+

@@ -2,6 +2,8 @@
 #include <math.h>
 #include <stdio.h>
 
+#define UNLABELED -1
+
 double sum_from_to(double *out_cumsum, int first, int last){
   double total = out_cumsum[last];
   if(0 < first){
@@ -28,6 +30,9 @@ int LOPART
   //error checking.
   if(!(0 <= penalty && penalty <= INFINITY)){
     return ERROR_PENALTY_MUST_BE_NON_NEGATIVE;
+  }
+  if(n_data < 1){
+    return ERROR_NO_DATA;
   }
   for(int j=0; j<n_labels; j++){
     if(input_label_end[j] <= input_label_start[j]){
@@ -86,7 +91,7 @@ int LOPART
       current_label_changes = input_label_changes[current_label_j];
     }
     // initialize values before optimization over changepoints.
-    out_last_change[t] = -3;
+    out_last_change[t] = -3; // no feasible changes.
     out_mean[t] = out_cost[t] = out_cost_candidates[t] = INFINITY;
     if(current_label_changes != 0){
       // no need to compute optimal cost if we are in a negative label.
@@ -124,7 +129,7 @@ int LOPART
   while(0 <= seg_end){
     int prev_end = out_last_change[seg_end];
     for(int t=prev_end+1; t<seg_end; t++){
-      out_last_change[t] = -2;
+      out_last_change[t] = -2; // not used in optimal solution.
     }
     seg_end = prev_end;
   }

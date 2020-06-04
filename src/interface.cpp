@@ -1,8 +1,29 @@
 #include "LOPART.h"
 #include <Rcpp.h>
 
+//' Low-level interface to LOPART C code
+//'
+//' Avoid using this function and instead use the LOPART function.
+//' @title Labeled Optimal Partitioning interface
+//' @param input_data numeric vector of N data to segment
+//' @param input_label_start integer vector of label start positions
+//'   in 0, ..., N-2
+//' @param input_label_end integer vector of label end positions in 1,
+//'   ..., N-1
+//' @param input_label_changes integer vector of 0/1, number of
+//'   labeled changes
+//' @param penalty non-negative numeric scalar (bigger for fewer
+//'   changes, smaller for more changes)
+//' @return data frame with four columns: cost_candidates is the cost
+//'   of each last segment start considered (from 1 to N) for the
+//'   computation of the optimal cost up to the last data point (Inf
+//'   means infeasible); cost_optimal is the optimal cost vector
+//'   computed using dynamic programming; mean is the last segment
+//'   mean of the optimal model ending at that data point; last_change
+//'   is the optimal changepoints (negative numbers are not used).
+//' @author Toby Dylan Hocking
 // [[Rcpp::export]]
-Rcpp::List LOPART_interface
+Rcpp::DataFrame LOPART_interface
 (Rcpp::NumericVector input_data,
  Rcpp::IntegerVector input_label_start,
  Rcpp::IntegerVector input_label_end,
@@ -55,6 +76,9 @@ Rcpp::List LOPART_interface
   }
   if(status == ERROR_LABEL_END_MUST_BE_LESS_THAN_N_DATA){
     Rcpp::stop("label end must be less than n data");
+  }
+  if(status == ERROR_NO_DATA){
+    Rcpp::stop("no data");
   }
   if(status != 0){
     Rcpp::stop("non-zero status %d", status); 

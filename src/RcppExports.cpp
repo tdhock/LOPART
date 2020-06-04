@@ -6,7 +6,7 @@
 using namespace Rcpp;
 
 // LOPART_interface
-Rcpp::List LOPART_interface(Rcpp::NumericVector input_data, Rcpp::IntegerVector input_label_start, Rcpp::IntegerVector input_label_end, Rcpp::IntegerVector input_label_changes, double penalty);
+Rcpp::DataFrame LOPART_interface(Rcpp::NumericVector input_data, Rcpp::IntegerVector input_label_start, Rcpp::IntegerVector input_label_end, Rcpp::IntegerVector input_label_changes, double penalty);
 RcppExport SEXP _LOPART_LOPART_interface(SEXP input_dataSEXP, SEXP input_label_startSEXP, SEXP input_label_endSEXP, SEXP input_label_changesSEXP, SEXP penaltySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
