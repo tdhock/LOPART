@@ -26,8 +26,8 @@ int LOPART
  int *out_last_change //out_last_change[t-1] tau*_t in paper.
  ){
   //error checking.
-  if(penalty<0){
-    return ERROR_PENALTY_NEGATIVE;
+  if(!(0 <= penalty && penalty <= INFINITY)){
+    return ERROR_PENALTY_MUST_BE_NON_NEGATIVE;
   }
   for(int j=0; j<n_labels; j++){
     if(input_label_end[j] <= input_label_start[j]){
@@ -57,6 +57,7 @@ int LOPART
   int n_change_candidates = 0;//DP initialization.
   int current_label_j = 0;
   int current_label_changes = UNLABELED;
+  int prev_positive_end = 0;
   for(int t=0; t<n_data; t++){
     if(current_label_changes == UNLABELED){
       // if we are in an unlabeled region then add this changepoint.
@@ -65,37 +66,12 @@ int LOPART
     }else if(current_label_changes == 1 && t == input_label_end[current_label_j]){
       // if we are at the last point of a positive label then reset
       // the set of change candidates to all changes in this region.
+      prev_positive_end = t;
       n_change_candidates=0;
       for(int change_candidate=input_label_start[current_label_j];
 	  change_candidate<t; change_candidate++){
 	out_change_candidates[n_change_candidates] = change_candidate;
 	n_change_candidates++;
-      }
-    }
-    out_cost[t] = out_cost_candidates[t] = INFINITY;
-    double cost_up_to_candidate;
-    for(int candidate_i=0; candidate_i<n_change_candidates; candidate_i++){
-      int change_candidate = out_change_candidates[candidate_i];
-      if(change_candidate == -1){
-	cost_up_to_candidate = -penalty;
-      }else{
-	cost_up_to_candidate = out_cost[change_candidate];
-      }
-      // sum_i (x_i - m)^2 =
-      // [sum_i x_i^2] - [2 m sum_i x_i] + [sum_i m^2]
-      double total = sum_from_to(out_cumsum, change_candidate+1, t);
-      int seg_size = t-change_candidate;
-      double seg_mean = total/seg_size;
-      double seg_cost = seg_size*seg_mean*seg_mean - 2*seg_mean*total;
-      double cost_up_to_t = cost_up_to_candidate + penalty + seg_cost;
-      if(t == n_data-1){
-	// store cost of each candidate at the end for visualization.
-	out_cost_candidates[change_candidate+1] = cost_up_to_t;
-      }
-      if(cost_up_to_t < out_cost[t]){
-	out_cost[t] = cost_up_to_t;
-	out_mean[t] = seg_mean;
-	out_last_change[t] = change_candidate;
       }
     }
     if(current_label_j < n_labels && t == input_label_end[current_label_j]){
@@ -105,7 +81,42 @@ int LOPART
       current_label_changes = UNLABELED;
     }
     if(current_label_j < n_labels && t == input_label_start[current_label_j]){
+      // if we are at the start of any label then set new
+      // current_label_changes.
       current_label_changes = input_label_changes[current_label_j];
+    }
+    // initialize values before optimization over changepoints.
+    out_last_change[t] = -3;
+    out_mean[t] = out_cost[t] = out_cost_candidates[t] = INFINITY;
+    if(current_label_changes != 0){
+      // no need to compute optimal cost if we are in a negative label.
+      for(int candidate_i=0; candidate_i<n_change_candidates; candidate_i++){
+	int change_candidate = out_change_candidates[candidate_i];
+	// sum_i (x_i - m)^2 =
+	// [sum_i x_i^2] - [2 m sum_i x_i] + [sum_i m^2]
+	double total = sum_from_to(out_cumsum, change_candidate+1, t);
+	int seg_size = t-change_candidate;
+	double seg_mean = total/seg_size;
+	double seg_cost = seg_size*seg_mean*seg_mean - 2*seg_mean*total;
+	double cost_up_to_t = seg_cost;
+	if(change_candidate != -1){
+	  // special case of no additional penalty for no changes.
+	  cost_up_to_t += out_cost[change_candidate];
+	  if(prev_positive_end <= change_candidate){
+	    // only penalize changes outside of labels.
+	    cost_up_to_t += penalty;
+	  }
+	}
+	if(t == n_data-1){
+	  // store cost of each candidate at the end for visualization.
+	  out_cost_candidates[change_candidate+1] = cost_up_to_t;
+	}
+	if(cost_up_to_t < out_cost[t]){
+	  out_cost[t] = cost_up_to_t;
+	  out_mean[t] = seg_mean;
+	  out_last_change[t] = change_candidate;
+	}
+      }
     }
   }//for(t
   //decoding.

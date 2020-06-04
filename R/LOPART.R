@@ -23,12 +23,23 @@ LOPART <- structure(function # Labeled Optimal PARTitioning
   change.vec <- out_dt[0 <= last_change, last_change+1L]
   penalized.cost <- out_dt[.N, cost_optimal]
   n.changes <- length(change.vec)
+  labeled.changes <- sum(labels$changes==1)
+  unlabeled.changes <- n.changes-labeled.changes
+  complexity.term <- if(unlabeled.changes==0){
+    0 # special case needed when penalty=Inf.
+  }else{
+    unlabeled.changes*penalty
+  }
+  total.loss <- penalized.cost-complexity.term
   ##value<< list with named elements, all of which are data tables
   list(
     loss=data.table( ##<< one row with loss/cost values
       n.changes,
+      labeled.changes,
+      unlabeled.changes,
+      penalty,
       penalized.cost,
-      total.loss=penalized.cost+n.changes*penalty),
+      total.loss),
     cost=out_dt, ##<< output from LOPART_interface
     changes=data.table( ##<< one row for each predicted changepoint
       change=change.vec+0.5),
@@ -97,10 +108,9 @@ LOPART <- structure(function # Labeled Optimal PARTitioning
     )]
     cost.dt.list[[model.name]] <- data.table(Algorithm, tau.dt)
     seg.dt.list[[model.name]] <- data.table(Algorithm, fit$segments)
-    change.dt.list[[model.name]] <- data.table(
-      Algorithm, fit$changes)
+    change.dt.list[[model.name]] <- data.table(Algorithm, fit$changes)
   }
-  seg.dt <- do.call(rbind, seg.dt.list)[, .(Algorithm, mean, start, end)]
+  seg.dt <- do.call(rbind, seg.dt.list)
   change.dt <- do.call(rbind, change.dt.list)
   cost.dt <- do.call(rbind, cost.dt.list)
 

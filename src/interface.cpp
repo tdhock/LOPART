@@ -38,6 +38,9 @@ Rcpp::List LOPART_interface
      &out_cost[0],
      &out_mean[0],
      &out_last_change[0]);
+  if(status == ERROR_PENALTY_MUST_BE_NON_NEGATIVE){
+    Rcpp::stop("penalty must be non-negative"); 
+  }
   if(status != 0){
     Rcpp::stop("non-zero status"); 
   }
