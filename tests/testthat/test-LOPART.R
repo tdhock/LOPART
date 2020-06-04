@@ -128,3 +128,57 @@ test_that("error for NA penalty", {
     LOPART:::LOPART_interface(x, integer(), integer(), integer(), NA)
   }, "penalty must be non-negative")
 })
+
+test_that("error for label with start=end", {
+  expect_error({
+    LOPART:::LOPART_interface(x, 1, 1, 1, 1)
+  }, "each label start must be less than its end")
+})    
+
+test_that("error for label with start>end", {
+  expect_error({
+    LOPART:::LOPART_interface(x, 2, 1, 1, 1)
+  }, "each label start must be less than its end") 
+})    
+
+test_that("error for label changes not 0/1", {
+  expect_error({
+    LOPART:::LOPART_interface(x, 1, 2, 5, 1)
+  }, "labeled number of changes must be 0 or 1")
+})    
+
+test_that("error for label start < prev label end", {
+  expect_error({
+    LOPART:::LOPART_interface(x, c(1, 2), c(3, 4), c(1, 1), 1)
+  }, "each label start must be on or after previous end")
+})
+
+test_that("error for start/changes sizes that do not match", {
+  expect_error({
+    LOPART:::LOPART_interface(x, c(1, 2), c(3, 4), 1, 1)
+  }, "input_label_start and input_label_changes sizes must match")
+})
+
+test_that("error for end/changes sizes that do not match", {
+  expect_error({
+    LOPART:::LOPART_interface(x, 1, c(3, 4), 1, 1)
+  }, "input_label_end and input_label_changes sizes must match")
+})
+
+test_that("error for end equal to n data", {
+  expect_error({
+    LOPART:::LOPART_interface(x, 1, 4, 1, 1)
+  }, "label end must be less than n data")
+})
+
+test_that("error for end > n data", {
+  expect_error({
+    LOPART:::LOPART_interface(x, 1, 400, 1, 1)
+  }, "label end must be less than n data")
+})
+
+test_that("error for start < 0", {
+  expect_error({
+    LOPART:::LOPART_interface(x, -1, 2, 1, 1)
+  }, "label start must be zero or larger")
+})

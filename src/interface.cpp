@@ -41,8 +41,23 @@ Rcpp::List LOPART_interface
   if(status == ERROR_PENALTY_MUST_BE_NON_NEGATIVE){
     Rcpp::stop("penalty must be non-negative"); 
   }
+  if(status == ERROR_EACH_LABEL_START_MUST_BE_LESS_THAN_ITS_END){
+    Rcpp::stop("each label start must be less than its end");
+  }
+  if(status == ERROR_LABELED_NUMBER_OF_CHANGES_MUST_BE_0_OR_1){
+    Rcpp::stop("labeled number of changes must be 0 or 1");
+  }
+  if(status == ERROR_EACH_LABEL_START_MUST_BE_ON_OR_AFTER_PREVIOUS_END){
+    Rcpp::stop("each label start must be on or after previous end");
+  }
+  if(status == ERROR_LABEL_START_MUST_BE_ZERO_OR_LARGER){
+    Rcpp::stop("label start must be zero or larger");
+  }
+  if(status == ERROR_LABEL_END_MUST_BE_LESS_THAN_N_DATA){
+    Rcpp::stop("label end must be less than n data");
+  }
   if(status != 0){
-    Rcpp::stop("non-zero status"); 
+    Rcpp::stop("non-zero status %d", status); 
   }
   return Rcpp::DataFrame::create
     (

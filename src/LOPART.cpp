@@ -31,21 +31,21 @@ int LOPART
   }
   for(int j=0; j<n_labels; j++){
     if(input_label_end[j] <= input_label_start[j]){
-      return ERROR_LABEL_END_NOT_GREATER_THAN_START;
+      return ERROR_EACH_LABEL_START_MUST_BE_LESS_THAN_ITS_END;
     }
     if(input_label_changes[j] != 0 && input_label_changes[j] != 1){
-      return ERROR_LABEL_NOT_ZERO_ONE;
+      return ERROR_LABELED_NUMBER_OF_CHANGES_MUST_BE_0_OR_1;
     }
     if(0<j){
       if(input_label_start[j] < input_label_end[j-1]){
-	return ERROR_LABEL_START_LESS_THAN_NEXT_PREV_END;
+	return ERROR_EACH_LABEL_START_MUST_BE_ON_OR_AFTER_PREVIOUS_END;
       }
     }
     if(input_label_start[j] < 0){
-      return ERROR_LABEL_START_LESS_THAN_ZERO;
+      return ERROR_LABEL_START_MUST_BE_ZERO_OR_LARGER;
     }
     if(n_data <= input_label_end[j]){
-      return ERROR_LABEL_END_NOT_LESS_THAN_N_DATA;
+      return ERROR_LABEL_END_MUST_BE_LESS_THAN_N_DATA;
     }
   }
   // initialize cumsum vector.
