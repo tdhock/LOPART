@@ -80,8 +80,8 @@ Rcpp::DataFrame LOPART_interface
   if(status == ERROR_NO_DATA){
     Rcpp::stop("no data");
   }
-  if(status != 0){
-    Rcpp::stop("non-zero status %d", status); 
+  if(status == ERROR_DATA_MUST_BE_FINITE){
+    Rcpp::stop("data must be finite");
   }
   return Rcpp::DataFrame::create
     (

@@ -56,8 +56,12 @@ int LOPART
   // initialize cumsum vector.
   double total = 0.0;
   for(int t=0; t<n_data; t++){
-    total += input_data[t];
-    out_cumsum[t] = total;
+    if(-INFINITY < input_data[t] && input_data[t] < INFINITY){
+      total += input_data[t];
+      out_cumsum[t] = total;
+    }else{
+      return ERROR_DATA_MUST_BE_FINITE;
+    }
   }
   int n_change_candidates = 0;//DP initialization.
   int current_label_j = 0;
