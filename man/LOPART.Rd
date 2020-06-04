@@ -14,10 +14,17 @@ changes. start/end should be indices of x, from 1 to
 length(x). changes should be either 0 or 1. The prediced
 changepoints are guaranteed to be consistent with these labels.}
 
-\item{penalty}{non-negative penalty constant.}
+\item{penalty}{non-negative penalty constant (larger for fewer
+changes, smaller for more changes). penalty=0 means a change in
+every unlabeled region, penalty=Inf means no changes in
+unlabeled regions.}
 }
 \value{
-list with named elements, all of which are data tables.
+list with named elements, all of which are data
+  tables. loss has one row with loss/cost values. cost is the
+  output from LOPART_interface. changes has one row for each
+  predicted changepoint (e.g. change=1.5 means a change between
+  data points 1 and 2). segments has one row for each segment.
 }
 \description{
 Compute an optimal segmentation (change in Gaussian mean model,

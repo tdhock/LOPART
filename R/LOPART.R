@@ -16,10 +16,14 @@
 ##'   changes. start/end should be indices of x, from 1 to
 ##'   length(x). changes should be either 0 or 1. The prediced
 ##'   changepoints are guaranteed to be consistent with these labels.
-##' @param penalty non-negative penalty constant.
+##' @param penalty non-negative penalty constant (larger for fewer
+##'   changes, smaller for more changes). penalty=0 means a change in
+##'   every unlabeled region, penalty=Inf means no changes in
+##'   unlabeled regions.
 ##' @example inst/examples/LOPART.R
 LOPART <- function(x, labels, penalty){
   last_change <- cost_optimal <- . <- NULL
+  ## above to avoid CRAN NOTE.
   out_df <- LOPART_interface(
     x,
     labels$start-1L,
