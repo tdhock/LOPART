@@ -1,1 +1,5 @@
 Labelled Optimal Partitioning
+
+| [[file:tests/testthat][tests]]    | [[https://travis-ci.org/tdhock/LOPART][https://travis-ci.org/tdhock/LOPART.png?branch=master]]                           |
+| [[https://github.com/jimhester/covr][coverage]] | [[https://coveralls.io/github/tdhock/LOPART?branch=master][https://coveralls.io/repos/tdhock/LOPART/badge.svg?branch=master&service=github]] |
+
