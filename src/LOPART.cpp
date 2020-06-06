@@ -20,7 +20,7 @@ int LOPART
  int *input_label_changes,
  int n_labels,//M in paper
  double penalty,//lambda.
- int output_candidates,
+ int n_updates,//size of out_ arrays and number of dp updates.
  //inputs above, outputs below.
  double *out_cumsum,//for computing optimal cost of a segment.
  int *out_change_candidates,//T_t
@@ -57,7 +57,7 @@ int LOPART
   }
   // initialize cumsum vector.
   double total = 0.0;
-  for(int t=0; t<n_data; t++){
+  for(int t=0; t<n_updates; t++){
     if(-INFINITY < input_data[t] && input_data[t] < INFINITY){
       total += input_data[t];
       out_cumsum[t] = total;
@@ -69,7 +69,7 @@ int LOPART
   int current_label_j = 0;
   int current_label_changes = UNLABELED;
   int prev_positive_end = 0;
-  for(int t=0; t<n_data; t++){
+  for(int t=0; t<n_updates; t++){
     if(current_label_changes == UNLABELED){
       // if we are in an unlabeled region then add this changepoint.
       out_change_candidates[n_change_candidates] = t-1;
@@ -118,7 +118,7 @@ int LOPART
 	    cost_up_to_t += penalty;
 	  }
 	}
-	if(t == output_candidates){
+	if(t == n_updates-1){
 	  // store cost of each candidate at the end for visualization.
 	  out_cost_candidates[change_candidate+1] = cost_up_to_t;
 	}
@@ -131,7 +131,7 @@ int LOPART
     }
   }//for(t
   //decoding.
-  int seg_end = n_data-1;
+  int seg_end = n_updates-1;
   while(0 <= seg_end){
     int prev_end = out_last_change[seg_end];
     for(int t=prev_end+1; t<seg_end; t++){

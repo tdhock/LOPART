@@ -29,7 +29,7 @@ Rcpp::DataFrame LOPART_interface
  Rcpp::IntegerVector input_label_end,
  Rcpp::IntegerVector input_label_changes,
  double penalty,
- int output_candidates
+ int n_updates
  ) {
   int n_data = input_data.size();
   int n_labels = input_label_changes.size();
@@ -39,12 +39,12 @@ Rcpp::DataFrame LOPART_interface
   if(input_label_end.size() != n_labels){
     Rcpp::stop("input_label_end and input_label_changes sizes must match");
   }
-  Rcpp::NumericVector out_cumsum(n_data);
-  Rcpp::IntegerVector out_change_candidates(n_data);
-  Rcpp::NumericVector out_cost_candidates(n_data);
-  Rcpp::NumericVector out_cost(n_data);
-  Rcpp::NumericVector out_mean(n_data);
-  Rcpp::IntegerVector out_last_change(n_data);
+  Rcpp::NumericVector out_cumsum(n_updates);
+  Rcpp::IntegerVector out_change_candidates(n_updates);
+  Rcpp::NumericVector out_cost_candidates(n_updates);
+  Rcpp::NumericVector out_cost(n_updates);
+  Rcpp::NumericVector out_mean(n_updates);
+  Rcpp::IntegerVector out_last_change(n_updates);
   int status = LOPART
     (&input_data[0],
      n_data,
@@ -53,7 +53,7 @@ Rcpp::DataFrame LOPART_interface
      &input_label_changes[0],
      n_labels,
      penalty,
-     output_candidates,
+     n_updates,
      //inputs above, outputs below.
      &out_cumsum[0],
      &out_change_candidates[0],

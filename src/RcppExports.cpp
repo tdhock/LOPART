@@ -6,8 +6,8 @@
 using namespace Rcpp;
 
 // LOPART_interface
-Rcpp::DataFrame LOPART_interface(Rcpp::NumericVector input_data, Rcpp::IntegerVector input_label_start, Rcpp::IntegerVector input_label_end, Rcpp::IntegerVector input_label_changes, double penalty, int output_candidates);
-RcppExport SEXP _LOPART_LOPART_interface(SEXP input_dataSEXP, SEXP input_label_startSEXP, SEXP input_label_endSEXP, SEXP input_label_changesSEXP, SEXP penaltySEXP, SEXP output_candidatesSEXP) {
+Rcpp::DataFrame LOPART_interface(Rcpp::NumericVector input_data, Rcpp::IntegerVector input_label_start, Rcpp::IntegerVector input_label_end, Rcpp::IntegerVector input_label_changes, double penalty, int n_updates);
+RcppExport SEXP _LOPART_LOPART_interface(SEXP input_dataSEXP, SEXP input_label_startSEXP, SEXP input_label_endSEXP, SEXP input_label_changesSEXP, SEXP penaltySEXP, SEXP n_updatesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -16,8 +16,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type input_label_end(input_label_endSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type input_label_changes(input_label_changesSEXP);
     Rcpp::traits::input_parameter< double >::type penalty(penaltySEXP);
-    Rcpp::traits::input_parameter< int >::type output_candidates(output_candidatesSEXP);
-    rcpp_result_gen = Rcpp::wrap(LOPART_interface(input_data, input_label_start, input_label_end, input_label_changes, penalty, output_candidates));
+    Rcpp::traits::input_parameter< int >::type n_updates(n_updatesSEXP);
+    rcpp_result_gen = Rcpp::wrap(LOPART_interface(input_data, input_label_start, input_label_end, input_label_changes, penalty, n_updates));
     return rcpp_result_gen;
 END_RCPP
 }
