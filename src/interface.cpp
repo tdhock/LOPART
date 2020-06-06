@@ -28,7 +28,8 @@ Rcpp::DataFrame LOPART_interface
  Rcpp::IntegerVector input_label_start,
  Rcpp::IntegerVector input_label_end,
  Rcpp::IntegerVector input_label_changes,
- double penalty
+ double penalty,
+ int output_candidates
  ) {
   int n_data = input_data.size();
   int n_labels = input_label_changes.size();
@@ -52,6 +53,7 @@ Rcpp::DataFrame LOPART_interface
      &input_label_changes[0],
      n_labels,
      penalty,
+     output_candidates,
      //inputs above, outputs below.
      &out_cumsum[0],
      &out_change_candidates[0],

@@ -20,6 +20,8 @@ int LOPART
  int *input_label_changes,
  int n_labels,//M in paper
  double penalty,//lambda.
+ int output_candidates,
+ //inputs above, outputs below.
  double *out_cumsum,//for computing optimal cost of a segment.
  int *out_change_candidates,//T_t
  double *out_cost_candidates,// for visualization.
@@ -116,7 +118,7 @@ int LOPART
 	    cost_up_to_t += penalty;
 	  }
 	}
-	if(t == n_data-1){
+	if(t == output_candidates){
 	  // store cost of each candidate at the end for visualization.
 	  out_cost_candidates[change_candidate+1] = cost_up_to_t;
 	}

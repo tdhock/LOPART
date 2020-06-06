@@ -1,5 +1,11 @@
 TODOs
 
+2020.6.6
+
+output_candidates parameter which controls for what t we output the
+cost of each candidate tau, default is t=N-1 (last data point) which
+is same as previous behavior.
+
 2020.6.4
 
 support for penalty=Inf, only penalize changes outside of labels.

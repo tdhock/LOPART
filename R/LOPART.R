@@ -21,7 +21,7 @@
 ##'   every unlabeled region, penalty=Inf means no changes in
 ##'   unlabeled regions.
 ##' @example inst/examples/LOPART.R
-LOPART <- function(x, labels, penalty){
+LOPART <- function(x, labels, penalty, out_candidates=length(x)){
   last_change <- cost_optimal <- . <- NULL
   ## above to avoid CRAN NOTE.
   out_df <- LOPART_interface(
@@ -29,7 +29,8 @@ LOPART <- function(x, labels, penalty){
     labels$start-1L,
     labels$end-1L,
     labels$changes,
-    penalty)
+    penalty,
+    out_candidates-1L)
   out_dt <- data.table(out_df)
   change.vec <- out_dt[0 <= last_change, last_change+1L]
   penalized.cost <- out_dt[.N, cost_optimal]

@@ -22,7 +22,7 @@
 #'   mean of the optimal model ending at that data point; last_change
 #'   is the optimal changepoints (negative numbers are not used).
 #' @author Toby Dylan Hocking
-LOPART_interface <- function(input_data, input_label_start, input_label_end, input_label_changes, penalty) {
-    .Call(`_LOPART_LOPART_interface`, input_data, input_label_start, input_label_end, input_label_changes, penalty)
+LOPART_interface <- function(input_data, input_label_start, input_label_end, input_label_changes, penalty, output_candidates) {
+    .Call(`_LOPART_LOPART_interface`, input_data, input_label_start, input_label_end, input_label_changes, penalty, output_candidates)
 }
 

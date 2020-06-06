@@ -15,6 +15,7 @@ int LOPART
  int *input_label_changes,
  int n_labels,//M in paper
  double penalty,//lambda.
+ int output_candidates,
  double *out_cumsum,//for computing optimal cost of a segment.
  int *out_change_candidates,//T_t
  double *out_cost_candidates,// for visualization.
