@@ -9,19 +9,19 @@ no.labels <- data.frame(
 
 test_that("LOPART with no labels and penalty=0", {
   out_list <- LOPART::LOPART(x, no.labels, 0)
-  expect_equal(out_list$loss$n.changes, 3)
-  expect_equal(out_list$loss$total.loss + sum(x*x), 0)
+  expect_equal(out_list$loss$changes_total, 3)
+  expect_equal(out_list$loss$total_loss + sum(x*x), 0)
 })
 
 test_that("LOPART with no labels and big penalty", {
   penalty <- 100000
   out_list <- LOPART::LOPART(x, no.labels, penalty)
-  expect_equal(out_list$loss$n.changes, 0)
+  expect_equal(out_list$loss$changes_total, 0)
   expect_equal(out_list$cost$mean, cumsum(x)/seq_along(x))
 })
 test_that("LOPART with no labels and penalty=Inf", {
   out_list <- LOPART::LOPART(x, no.labels, Inf)
-  expect_equal(out_list$loss$n.changes, 0)
+  expect_equal(out_list$loss$changes_total, 0)
   expect_equal(out_list$cost$mean, cumsum(x)/seq_along(x))
 })
 
@@ -31,8 +31,8 @@ test_that("LOPART with one positive label on [1,4] and penalty=0", {
     end=length(x),
     changes=1)
   out_list <- LOPART::LOPART(x, pos14.label, 0)
-  expect_equal(out_list$loss$n.changes, 1)
-  expect_equal(out_list$loss$penalized.cost, out_list$loss$total.loss)
+  expect_equal(out_list$loss$changes_total, 1)
+  expect_equal(out_list$loss$penalized_cost, out_list$loss$total_loss)
 })
 
 test_that("LOPART with one positive label on [1,4] and penalty=Inf", {
@@ -41,8 +41,8 @@ test_that("LOPART with one positive label on [1,4] and penalty=Inf", {
     end=length(x),
     changes=1)
   out_list <- LOPART::LOPART(x, pos14.label, Inf)
-  expect_equal(out_list$loss$n.changes, 1)
-  expect_equal(out_list$loss$penalized.cost, out_list$loss$total.loss)
+  expect_equal(out_list$loss$changes_total, 1)
+  expect_equal(out_list$loss$penalized_cost, out_list$loss$total_loss)
 })
 
 test_that("LOPART with one negative label on [1,4] and penalty=0", {
@@ -51,7 +51,7 @@ test_that("LOPART with one negative label on [1,4] and penalty=0", {
     end=length(x),
     changes=0)
   out_list <- LOPART::LOPART(x, neg14.label, 0)
-  expect_equal(out_list$loss$n.changes, 0)
+  expect_equal(out_list$loss$changes_total, 0)
   m <- mean(x)
   expected.segs <- data.table::data.table(start=1L, end=4L, mean=m)
   expect_equal(out_list$segments, expected.segs)
@@ -65,7 +65,7 @@ pos13.label <- data.frame(
   changes=1)
 test_that("LOPART with one positive label on [1,3] and penalty=0", {
   out_list <- LOPART::LOPART(x, pos13.label, 0)
-  expect_equal(out_list$loss$n.changes, 2)
+  expect_equal(out_list$loss$changes_total, 2)
   expect_equal(out_list$segments$end, 2:4)
 })
 test_that("LOPART with one positive label on [1,3] and small penalty", {
@@ -73,9 +73,9 @@ test_that("LOPART with one positive label on [1,3] and small penalty", {
   out_list <- LOPART::LOPART(x, pos13.label, penalty)
   m <- c(rep(mean(x[1:2]), 2), x[3:4])
   expected.loss <- sum((x-m)^2 - x^2)
-  expect_equal(out_list$loss$n.changes, 2)
-  expect_equal(out_list$loss$total.loss, expected.loss)
-  expect_equal(out_list$loss$penalized.cost, expected.loss+penalty)
+  expect_equal(out_list$loss$changes_total, 2)
+  expect_equal(out_list$loss$total_loss, expected.loss)
+  expect_equal(out_list$loss$penalized_cost, expected.loss+penalty)
   expect_equal(out_list$segments$end, 2:4)
 })
 test_that("LOPART with one positive label on [1,3] and big penalty", {
@@ -109,23 +109,23 @@ expected.cost <- sum((x-m)^2 - x^2)
 test_that("LOPART with three labels and penalty=0", {
   out_list <- LOPART::LOPART(x, three.labels, 0)
   expect_equal(out_list$segments$end, c(1, 3, 4))
-  expect_equal(out_list$loss$penalized.cost, expected.cost)
+  expect_equal(out_list$loss$penalized_cost, expected.cost)
 })
 test_that("LOPART with three labels and big penalty", {
   out_list <- LOPART::LOPART(x, three.labels, 100000)
   expect_equal(out_list$segments$end, c(1, 3, 4))
-  expect_equal(out_list$loss$penalized.cost, expected.cost)
+  expect_equal(out_list$loss$penalized_cost, expected.cost)
 })
 
 test_that("error for negative penalty", {
   expect_error({
-    LOPART::LOPART_interface(x, integer(), integer(), integer(), -1, 1)
+    LOPART::LOPART_interface(x, integer(), integer(), integer(), 1, -1)
   }, "penalty must be non-negative")
 })
 
 test_that("error for NA penalty", {
   expect_error({
-    LOPART::LOPART_interface(x, integer(), integer(), integer(), NA, 1)
+    LOPART::LOPART_interface(x, integer(), integer(), integer(), 1, NA)
   }, "penalty must be non-negative")
 })
 

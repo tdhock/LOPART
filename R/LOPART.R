@@ -21,7 +21,8 @@
 ##'   every unlabeled region, penalty=Inf means no changes in
 ##'   unlabeled regions.
 ##' @example inst/examples/LOPART.R
-LOPART <- function(x, labels, penalty, n_updates=length(x)){
+LOPART <- function
+(x, labels, penalty_unlabeled, n_updates=length(x), penalty_labeled=0){
   last_change <- cost_optimal <- . <- NULL
   ## above to avoid CRAN NOTE.
   out_df <- LOPART_interface(
@@ -29,28 +30,31 @@ LOPART <- function(x, labels, penalty, n_updates=length(x)){
     labels$start-1L,
     labels$end-1L,
     labels$changes,
-    penalty,
-    n_updates)
+    n_updates,
+    penalty_unlabeled,
+    penalty_labeled)
   out_dt <- data.table(out_df)
   change.vec <- out_dt[0 <= last_change, last_change+1L]
-  penalized.cost <- out_dt[.N, cost_optimal]
-  n.changes <- length(change.vec)
-  labeled.changes <- sum(labels$changes==1)
-  unlabeled.changes <- n.changes-labeled.changes
-  complexity.term <- if(unlabeled.changes==0){
+  penalized_cost <- out_dt[.N, cost_optimal]
+  changes_total <- length(change.vec)
+  changes_labeled <- sum(labels$changes==1)
+  changes_unlabeled <- changes_total-changes_labeled
+  term_unlabeled <- if(changes_unlabeled==0){
     0 # special case needed when penalty=Inf.
   }else{
-    unlabeled.changes*penalty
+    changes_unlabeled*penalty_unlabeled
   }
-  total.loss <- penalized.cost-complexity.term
+  term_labeled <- changes_labeled*penalty_labeled
+  total_loss <- penalized_cost-term_labeled-term_unlabeled
   list(
     loss=data.table(
-      n.changes,
-      labeled.changes,
-      unlabeled.changes,
-      penalty,
-      penalized.cost,
-      total.loss),
+      changes_total,
+      changes_labeled,
+      changes_unlabeled,
+      penalty_labeled,
+      penalty_unlabeled,
+      penalized_cost,
+      total_loss),
     cost=out_dt,
     changes=data.table(
       change=change.vec+0.5),

@@ -19,7 +19,8 @@ int LOPART
  int *input_label_end,
  int *input_label_changes,
  int n_labels,//M in paper
- double penalty,//lambda.
+ double penalty_unlabeled,//lambda.
+ double penalty_labeled,//lambda.
  int n_updates,//size of out_ arrays and number of dp updates.
  //inputs above, outputs below.
  double *out_cumsum,//for computing optimal cost of a segment.
@@ -30,7 +31,10 @@ int LOPART
  int *out_last_change //out_last_change[t-1] tau*_t in paper.
  ){
   //error checking.
-  if(!(0 <= penalty && penalty <= INFINITY)){
+  if(!(
+       0 <= penalty_unlabeled && penalty_unlabeled <= INFINITY &&
+       0 <= penalty_labeled && penalty_labeled <= INFINITY 
+       )){
     return ERROR_PENALTY_MUST_BE_NON_NEGATIVE;
   }
   if(n_data < 1){
@@ -113,10 +117,14 @@ int LOPART
 	if(change_candidate != -1){
 	  // special case of no additional penalty for no changes.
 	  cost_up_to_t += out_cost[change_candidate];
+	  double penalty;
 	  if(prev_positive_end <= change_candidate){
 	    // only penalize changes outside of labels.
-	    cost_up_to_t += penalty;
+	    penalty = penalty_unlabeled;
+	  }else{
+	    penalty = penalty_labeled;
 	  }
+	  cost_up_to_t += penalty;
 	}
 	if(t == n_updates-1){
 	  // store cost of each candidate at the end for visualization.
