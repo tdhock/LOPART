@@ -9,7 +9,9 @@ LOPART_interface(
   input_label_start,
   input_label_end,
   input_label_changes,
-  penalty
+  n_updates,
+  penalty_unlabeled,
+  penalty_labeled = 0
 )
 }
 \arguments{
@@ -24,8 +26,15 @@ in 0, ..., N-2}
 \item{input_label_changes}{integer vector of 0/1, number of
 labeled changes}
 
-\item{penalty}{non-negative numeric scalar (bigger for fewer
-changes, smaller for more changes)}
+\item{n_updates}{number of dynamic programming updates to perform,
+usually should be number of input_data N, but can be less if you
+want to analyze/plot the cost/candidates at previous data.}
+
+\item{penalty_unlabeled}{non-negative numeric scalar (bigger for
+fewer changes in unlabeled regions, smaller for more changes)}
+
+\item{penalty_labeled}{non-negative numeric scalar (penalty for
+each change in a positive label).}
 }
 \value{
 data frame with four columns: cost_candidates is the cost

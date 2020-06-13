@@ -22,7 +22,18 @@ test_that("LOPART with no labels and big penalty", {
 test_that("LOPART with no labels and penalty=Inf", {
   out_list <- LOPART::LOPART(x, no.labels, Inf)
   expect_equal(out_list$loss$changes_total, 0)
-  expect_equal(out_list$cost$mean, cumsum(x)/seq_along(x))
+  expected.cost <- c(rep(Inf, 3), sum((mean(x)-x)^2-x^2))
+  expect_equal(out_list$cost$cost_optimal, expected.cost)
+})
+test_that("LOPART_interface with no labels and penalty_unlabeled=Inf", {
+  out_df <- LOPART::LOPART_interface(
+    x, integer(), integer(), integer(),
+    n_updates=length(x),
+    penalty_unlabeled = Inf,
+    penalty_labeled=Inf)
+  expect_equal(out_df$mean, cumsum(x)/seq_along(x))
+  n.changes <- sum(0 <= out_df$last_change)
+  expect_equal(n.changes, 0)
 })
 
 test_that("LOPART with one positive label on [1,4] and penalty=0", {
@@ -42,7 +53,10 @@ test_that("LOPART with one positive label on [1,4] and penalty=Inf", {
     changes=1)
   out_list <- LOPART::LOPART(x, pos14.label, Inf)
   expect_equal(out_list$loss$changes_total, 1)
-  expect_equal(out_list$loss$penalized_cost, out_list$loss$total_loss)
+  expect_equal(out_list$loss$penalized_cost, Inf)
+  m <- c(rep(mean(x[1:2]), 2), rep(mean(x[3:4]), 2))
+  expected.loss <- sum((x-m)^2-x^2)
+  expect_equal(out_list$loss$total_loss, expected.loss)
 })
 
 test_that("LOPART with one negative label on [1,4] and penalty=0", {
@@ -72,10 +86,12 @@ test_that("LOPART with one positive label on [1,3] and small penalty", {
   penalty <- 0.1
   out_list <- LOPART::LOPART(x, pos13.label, penalty)
   m <- c(rep(mean(x[1:2]), 2), x[3:4])
+  expected.changes <- sum(diff(m) != 0)
   expected.loss <- sum((x-m)^2 - x^2)
   expect_equal(out_list$loss$changes_total, 2)
   expect_equal(out_list$loss$total_loss, expected.loss)
-  expect_equal(out_list$loss$penalized_cost, expected.loss+penalty)
+  expected.cost <- expected.loss+penalty*expected.changes
+  expect_equal(out_list$loss$penalized_cost, expected.cost)
   expect_equal(out_list$segments$end, 2:4)
 })
 test_that("LOPART with one positive label on [1,3] and big penalty", {
@@ -85,6 +101,17 @@ test_that("LOPART with one positive label on [1,3] and big penalty", {
 test_that("LOPART with one positive label on [1,3] and penalty=Inf", {
   out_list <- LOPART::LOPART(x, pos13.label, Inf)
   expect_equal(out_list$segments$end, c(2, 4))
+})
+test_that("LOPART_interface with one positive label on [1,3] and penalty=Inf", {
+  out_df <- LOPART::LOPART_interface(
+    x, pos13.label$start, pos13.label$end, pos13.label$changes,
+    n_updates=length(x),
+    penalty_labeled = 0,
+    penalty_unlabeled = Inf)
+  is.change <- 0 <= out_df$last_change
+  change.vec <- out_df$last_change[is.change]
+  end.vec <- c(change.vec+1, length(x))
+  expect_equal(end.vec, c(2, 4))
 })
 
 two.labels <- data.frame(
@@ -105,18 +132,20 @@ three.labels <- data.frame(
   end=2:4,
   changes=c(1, 0, 1))
 m <- c(x[1], rep(mean(x[2:3]), 2), x[4])
-expected.cost <- sum((x-m)^2 - x^2)
+expected.loss <- sum((x-m)^2 - x^2)
 test_that("LOPART with three labels and penalty=0", {
   out_list <- LOPART::LOPART(x, three.labels, 0)
   expect_equal(out_list$segments$end, c(1, 3, 4))
-  expect_equal(out_list$loss$penalized_cost, expected.cost)
+  expect_equal(out_list$loss$penalized_cost, expected.loss)
+  expect_equal(out_list$loss$total_loss, expected.loss)
 })
 test_that("LOPART with three labels and big penalty", {
-  out_list <- LOPART::LOPART(x, three.labels, 100000)
+  penalty <- 100000
+  out_list <- LOPART::LOPART(x, three.labels, penalty)
   expect_equal(out_list$segments$end, c(1, 3, 4))
-  expect_equal(out_list$loss$penalized_cost, expected.cost)
+  expect_equal(out_list$loss$penalized_cost, expected.loss+penalty*2)
+  expect_equal(out_list$loss$total_loss, expected.loss)
 })
-
 test_that("error for negative penalty", {
   expect_error({
     LOPART::LOPART_interface(x, integer(), integer(), integer(), 1, -1)
@@ -206,4 +235,3 @@ test_that("error for -Inf data", {
     LOPART::LOPART_interface(-Inf, integer(), integer(), integer(), 1, 1)
   }, "data must be finite")
 })
-

@@ -12,8 +12,13 @@
 //'   ..., N-1
 //' @param input_label_changes integer vector of 0/1, number of
 //'   labeled changes
-//' @param penalty non-negative numeric scalar (bigger for fewer
-//'   changes, smaller for more changes)
+//' @param n_updates number of dynamic programming updates to perform,
+//'   usually should be number of input_data N, but can be less if you
+//'   want to analyze/plot the cost/candidates at previous data.
+//' @param penalty_unlabeled non-negative numeric scalar (bigger for
+//'   fewer changes in unlabeled regions, smaller for more changes)
+//' @param penalty_labeled non-negative numeric scalar (penalty for
+//'   each change in a positive label).
 //' @return data frame with four columns: cost_candidates is the cost
 //'   of each last segment start considered (from 1 to N) for the
 //'   computation of the optimal cost up to the last data point (Inf
