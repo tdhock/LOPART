@@ -19,7 +19,10 @@ int LOPART
  int *input_label_end,
  int *input_label_changes,
  int n_labels,//M in paper
- double penalty,//lambda.
+ double penalty_unlabeled,//lambda.
+ double penalty_labeled,//lambda.
+ int n_updates,//size of out_ arrays and number of dp updates.
+ //inputs above, outputs below.
  double *out_cumsum,//for computing optimal cost of a segment.
  int *out_change_candidates,//T_t
  double *out_cost_candidates,// for visualization.
@@ -28,7 +31,10 @@ int LOPART
  int *out_last_change //out_last_change[t-1] tau*_t in paper.
  ){
   //error checking.
-  if(!(0 <= penalty && penalty <= INFINITY)){
+  if(!(
+       0 <= penalty_unlabeled && penalty_unlabeled <= INFINITY &&
+       0 <= penalty_labeled && penalty_labeled <= INFINITY 
+       )){
     return ERROR_PENALTY_MUST_BE_NON_NEGATIVE;
   }
   if(n_data < 1){
@@ -55,7 +61,7 @@ int LOPART
   }
   // initialize cumsum vector.
   double total = 0.0;
-  for(int t=0; t<n_data; t++){
+  for(int t=0; t<n_updates; t++){
     if(-INFINITY < input_data[t] && input_data[t] < INFINITY){
       total += input_data[t];
       out_cumsum[t] = total;
@@ -67,7 +73,7 @@ int LOPART
   int current_label_j = 0;
   int current_label_changes = UNLABELED;
   int prev_positive_end = 0;
-  for(int t=0; t<n_data; t++){
+  for(int t=0; t<n_updates; t++){
     if(current_label_changes == UNLABELED){
       // if we are in an unlabeled region then add this changepoint.
       out_change_candidates[n_change_candidates] = t-1;
@@ -111,12 +117,16 @@ int LOPART
 	if(change_candidate != -1){
 	  // special case of no additional penalty for no changes.
 	  cost_up_to_t += out_cost[change_candidate];
+	  double penalty;
 	  if(prev_positive_end <= change_candidate){
 	    // only penalize changes outside of labels.
-	    cost_up_to_t += penalty;
+	    penalty = penalty_unlabeled;
+	  }else{
+	    penalty = penalty_labeled;
 	  }
+	  cost_up_to_t += penalty;
 	}
-	if(t == n_data-1){
+	if(t == n_updates-1){
 	  // store cost of each candidate at the end for visualization.
 	  out_cost_candidates[change_candidate+1] = cost_up_to_t;
 	}
@@ -129,7 +139,7 @@ int LOPART
     }
   }//for(t
   //decoding.
-  int seg_end = n_data-1;
+  int seg_end = n_updates-1;
   while(0 <= seg_end){
     int prev_end = out_last_change[seg_end];
     for(int t=prev_end+1; t<seg_end; t++){

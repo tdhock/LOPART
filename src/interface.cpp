@@ -12,8 +12,13 @@
 //'   ..., N-1
 //' @param input_label_changes integer vector of 0/1, number of
 //'   labeled changes
-//' @param penalty non-negative numeric scalar (bigger for fewer
-//'   changes, smaller for more changes)
+//' @param n_updates number of dynamic programming updates to perform,
+//'   usually should be number of input_data N, but can be less if you
+//'   want to analyze/plot the cost/candidates at previous data.
+//' @param penalty_unlabeled non-negative numeric scalar (bigger for
+//'   fewer changes in unlabeled regions, smaller for more changes)
+//' @param penalty_labeled non-negative numeric scalar (penalty for
+//'   each change in a positive label).
 //' @return data frame with four columns: cost_candidates is the cost
 //'   of each last segment start considered (from 1 to N) for the
 //'   computation of the optimal cost up to the last data point (Inf
@@ -28,7 +33,9 @@ Rcpp::DataFrame LOPART_interface
  Rcpp::IntegerVector input_label_start,
  Rcpp::IntegerVector input_label_end,
  Rcpp::IntegerVector input_label_changes,
- double penalty
+ int n_updates,
+ double penalty_unlabeled,
+ double penalty_labeled = 0
  ) {
   int n_data = input_data.size();
   int n_labels = input_label_changes.size();
@@ -38,12 +45,12 @@ Rcpp::DataFrame LOPART_interface
   if(input_label_end.size() != n_labels){
     Rcpp::stop("input_label_end and input_label_changes sizes must match");
   }
-  Rcpp::NumericVector out_cumsum(n_data);
-  Rcpp::IntegerVector out_change_candidates(n_data);
-  Rcpp::NumericVector out_cost_candidates(n_data);
-  Rcpp::NumericVector out_cost(n_data);
-  Rcpp::NumericVector out_mean(n_data);
-  Rcpp::IntegerVector out_last_change(n_data);
+  Rcpp::NumericVector out_cumsum(n_updates);
+  Rcpp::IntegerVector out_change_candidates(n_updates);
+  Rcpp::NumericVector out_cost_candidates(n_updates);
+  Rcpp::NumericVector out_cost(n_updates);
+  Rcpp::NumericVector out_mean(n_updates);
+  Rcpp::IntegerVector out_last_change(n_updates);
   int status = LOPART
     (&input_data[0],
      n_data,
@@ -51,7 +58,9 @@ Rcpp::DataFrame LOPART_interface
      &input_label_end[0],
      &input_label_changes[0],
      n_labels,
-     penalty,
+     penalty_unlabeled,
+     penalty_labeled,
+     n_updates,
      //inputs above, outputs below.
      &out_cumsum[0],
      &out_change_candidates[0],

@@ -12,8 +12,13 @@
 #'   ..., N-1
 #' @param input_label_changes integer vector of 0/1, number of
 #'   labeled changes
-#' @param penalty non-negative numeric scalar (bigger for fewer
-#'   changes, smaller for more changes)
+#' @param n_updates number of dynamic programming updates to perform,
+#'   usually should be number of input_data N, but can be less if you
+#'   want to analyze/plot the cost/candidates at previous data.
+#' @param penalty_unlabeled non-negative numeric scalar (bigger for
+#'   fewer changes in unlabeled regions, smaller for more changes)
+#' @param penalty_labeled non-negative numeric scalar (penalty for
+#'   each change in a positive label).
 #' @return data frame with four columns: cost_candidates is the cost
 #'   of each last segment start considered (from 1 to N) for the
 #'   computation of the optimal cost up to the last data point (Inf
@@ -22,7 +27,7 @@
 #'   mean of the optimal model ending at that data point; last_change
 #'   is the optimal changepoints (negative numbers are not used).
 #' @author Toby Dylan Hocking
-LOPART_interface <- function(input_data, input_label_start, input_label_end, input_label_changes, penalty) {
-    .Call(`_LOPART_LOPART_interface`, input_data, input_label_start, input_label_end, input_label_changes, penalty)
+LOPART_interface <- function(input_data, input_label_start, input_label_end, input_label_changes, n_updates, penalty_unlabeled, penalty_labeled = 0) {
+    .Call(`_LOPART_LOPART_interface`, input_data, input_label_start, input_label_end, input_label_changes, n_updates, penalty_unlabeled, penalty_labeled)
 }
 

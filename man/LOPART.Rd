@@ -4,7 +4,13 @@
 \alias{LOPART}
 \title{Labeled Optimal PARTitioning}
 \usage{
-LOPART(x, labels, penalty)
+LOPART(
+  x,
+  labels,
+  penalty_unlabeled,
+  n_updates = length(x),
+  penalty_labeled = penalty_unlabeled
+)
 }
 \arguments{
 \item{x}{numeric vector of data to fit a Gaussian mean model.}
@@ -14,10 +20,16 @@ changes. start/end should be indices of x, from 1 to
 length(x). changes should be either 0 or 1. The prediced
 changepoints are guaranteed to be consistent with these labels.}
 
-\item{penalty}{non-negative penalty constant (larger for fewer
-changes, smaller for more changes). penalty=0 means a change in
-every unlabeled region, penalty=Inf means no changes in
-unlabeled regions.}
+\item{penalty_unlabeled}{non-negative penalty constant (larger for
+fewer changes, smaller for more changes). penalty=0 means a
+change in every unlabeled region, penalty=Inf means no changes
+in unlabeled regions.}
+
+\item{n_updates}{how many dynamic programming updates to compute?
+Must be at least 1 and at most length(x).}
+
+\item{penalty_labeled}{non-negative penalty constant to use for
+changes in positive labels.}
 }
 \value{
 list with named elements, all of which are data
