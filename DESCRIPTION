@@ -4,7 +4,7 @@ Title: Labeled Optimal Partitioning
 Version: 2020.6.6
 Author: Toby Dylan Hocking
 Maintainer: Toby Dylan Hocking <toby.hocking@r-project.org>
-Description: Changepoint detection algorithm with
+Description: Change-point detection algorithm with
  label constraints and a penalty for each change outside of labels.
 License: GPL-3
 LinkingTo: Rcpp
