@@ -3,3 +3,76 @@ Labelled Optimal Partitioning
 | [[file:tests/testthat][tests]]    | [[https://travis-ci.org/tdhock/LOPART][https://travis-ci.org/tdhock/LOPART.png?branch=master]]                           |
 | [[https://github.com/jimhester/covr][coverage]] | [[https://coveralls.io/github/tdhock/LOPART?branch=master][https://coveralls.io/repos/tdhock/LOPART/badge.svg?branch=master&service=github]] |
 
+** Installation
+
+#+BEGIN_SRC R
+install.packages("LOPART")
+## OR
+devtools::install_github("tdhock/LOPART")
+#+END_SRC
+
+** Usage
+
+The main function that you should use is 
+
+#+BEGIN_SRC R
+  set.seed(1);data.vec <- rnorm(4)
+  label.df <- data.frame(
+    start=c(1, 3), end=c(2, 4), changes=c(1, 0))
+  ## large penalty, few changepoints.
+  fit1 <- LOPART::LOPART(data.vec, label.df, 10000)
+  ## small penalty, many changepoints.
+  fit2 <- LOPART::LOPART(data.vec, label.df, 0.001)
+#+END_SRC
+
+The resulting model fit list looks like
+
+#+BEGIN_SRC 
+> fit2
+$loss
+   changes_total changes_labeled changes_unlabeled penalty_labeled
+1:             2               1                 1           0.001
+   penalty_unlabeled penalized_cost total_loss
+1:             0.001      -0.712705  -0.714705
+
+$cost
+   cost_candidates cost_optimal       mean last_change
+1:             Inf   -0.3924444 -0.6264538          -1
+2:      -0.6880465   -0.4251692  0.1836433           0
+3:      -0.7127050          Inf        Inf          -2
+4:             Inf   -0.7127050  0.3798261           1
+
+$changes
+   change
+1:    1.5
+2:    2.5
+
+$segments
+   start end       mean
+1:     1   1 -0.6264538
+2:     2   2  0.1836433
+3:     3   4  0.3798261
+
+> 
+#+END_SRC
+
+Each element is a data table:
+- loss has one column with various statistics about model complexity
+  (penalty, changes) and loss/cost.
+- cost has one row for each dynamic programming update (by default
+  equal to the number of data points but for visualizing how the
+  algorithm works at intermediate values you can use the =n_updates=
+  parameter). 
+  - cost_candidates is the cost of each candidate start position for
+    the last segment (used for the last dynamic programming update).
+  - cost_optimal is the cost of the optimal model up to each data
+    point (W in the paper, computed via dynamic programming).
+  - mean is the optimal last segment mean up to each data point (mu in
+    the paper, also computed during dynamic programming).
+  - last_change is the optimal last change for the optimal model up to
+    each data point (tau^* in the paper, also computed during dynamic
+    programming).
+- changes has one row for each predicted changepoint position in the
+  optimal model (e.g. 1.5 means change between data points 1 and 2).
+- segments has one row for each predicted segment in the optimal
+  model.
